@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir discord python-dotenv
+RUN pip install --no-cache-dir discord python-dotenv pymongo
 
 COPY . .
 
