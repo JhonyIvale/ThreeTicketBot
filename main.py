@@ -29,7 +29,13 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command()
 async def ticketinit(ctx):
-    if discord.utils.get(ctx.author.roles, name='Ticket-Manager'):
+    # checking if the role "Ticket-Manager exist, and if not create."
+    role = discord.utils.get(ctx.guild.roles, name="Ticket-Manager")
+    if role is None:
+        await ctx.send("The role Ticket-Manager don't exist, creating...")
+        await ctx.guild.create_role(name="Ticket-Manager", permissions=discord.Permissions(send_messages=False), reason="Role required for ticket system")
+    # Checking if the user have the role "Ticket-Manger or admin."
+    if discord.utils.get(ctx.author.roles, name='Ticket-Manager') or ctx.author.guild_permissions.administrator:    
         if collection.find_one({"id": ctx.guild.id}): # Já foi inicializado
             await ctx.send("Its already initialized.")
             return
@@ -48,17 +54,22 @@ async def ticketinit(ctx):
             "channel": ctx.channel.id,
             "message": message.id
         })
-
-        role = discord.utils.get(ctx.guild.roles, name="Ticket-Manager")
-        if role is None:
-            await ctx.guild.create_role(name="Ticket-Manager", permissions=discord.Permissions(send_messages=False), reason="Role required for ticket system")
     else:
-        await ctx.send("you don't have permission")
+        await ctx.send("you don't the role or admin")
+        
+        
+        
 
 
 @bot.command()
 async def ticketreset(ctx):
-    if discord.utils.get(ctx.author.roles, name='Ticket-Manager'):
+    role = discord.utils.get(ctx.guild.roles, name="Ticket-Manager")
+    if role is None:
+         # checking if the role "Ticket-Manager exist, and if not create."
+            await ctx.send("The role Ticket-Manager don't exist, creating...")
+            await ctx.guild.create_role(name="Ticket-Manager", permissions=discord.Permissions(send_messages=False), reason="Role required for ticket system")
+    
+    if discord.utils.get(ctx.author.roles, name='Ticket-Manager') or ctx.author.guild_permissions.administrator:
         dados_server = collection.find_one({"id": ctx.guild.id})
         if dados_server == None:
             await ctx.send("Not initialized.")
@@ -78,7 +89,7 @@ async def ticketreset(ctx):
         
         collection.delete_one({"id": ctx.guild.id})
     else:
-       await ctx.send("you don't have permission")   
+        await ctx.send("you don't the role or admin")  
 
 @bot.event
 async def on_ready():
